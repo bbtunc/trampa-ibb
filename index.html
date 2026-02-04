@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İBB Parselleri Değerleme Çalışması</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+            font-weight: 400;
+        }
+        
+        .header {
+            background: white;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid #E8E8E8;
+        }
+        
+        .logo {
+            height: 42px;
+            width: auto;
+        }
+        
+        .header-text {
+            flex: 1;
+        }
+        
+        .header h1 {
+            font-size: 1.35em;
+            margin: 0;
+            font-weight: 600;
+            color: #00438C;
+            letter-spacing: -0.02em;
+        }
+        
+        .container {
+            display: flex;
+            height: calc(100vh - 74px);
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #E8E8E8;
+            overflow-y: auto;
+            padding: 20px 16px;
+        }
+        
+        .sidebar h2 {
+            color: #1A1A1A;
+            font-size: 1.1em;
+            margin-bottom: 16px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .upload-section {
+            margin-bottom: 24px;
+        }
+        
+        .upload-area {
+            border: 2px solid #E8E8E8;
+            border-radius: 12px;
+            padding: 32px 16px;
+            text-align: center;
+            background: #FAFAFA;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #007973 0%, #00438C 100%);
+            opacity: 0;
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .upload-area:hover {
+            border-color: #007973;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 121, 115, 0.12);
+        }
+        
+        .upload-area:hover::before {
+            opacity: 0.03;
+        }
+        
+        .upload-area.dragover {
+            border-color: #007973;
+            background: white;
+            box-shadow: 0 12px 32px rgba(0, 121, 115, 0.15);
+        }
+        
+        .upload-area.dragover::before {
+            opacity: 0.05;
+        }
+        
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .upload-text {
+            color: #1A1A1A;
+            font-size: 0.85em;
+            line-height: 1.5;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .upload-text-sub {
+            color: #666;
+            font-size: 0.8em;
+            margin-top: 6px;
+            font-weight: 400;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .file-list {
+            margin-top: 20px;
+        }
+        
+        .file-list-header {
+            font-size: 0.75em;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+        
+        .file-item {
+            background: white;
+            border: 1px solid #E8E8E8;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(135deg, #007973 0%, #1B9B97 100%);
+            transform: translateX(-3px);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .file-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+            border-color: #D0D0D0;
+        }
+        
+        .file-item:hover::before {
+            transform: translateX(0);
+        }
+        
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #1A1A1A;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 0.85em;
+            flex: 1;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-toggle {
+            background: linear-gradient(135deg, #007973 0%, #1B9B97 100%);
+            color: white;
+            box-shadow: 0 2px 6px rgba(0, 121, 115, 0.2);
+        }
+        
+        .btn-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 121, 115, 0.3);
+        }
+        
+        .btn-toggle.hidden {
+            background: #D0D0D0;
+            box-shadow: none;
+        }
+        
+        .btn-edit {
+            background: #00ACE5;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0, 172, 229, 0.2);
+        }
+        
+        .btn-edit:hover {
+            background: #0095CC;
+            transform: translateY(-1px);
+        }
+        
+        .btn-remove {
+            background: white;
+            color: #666;
+            border: 1px solid #E8E8E8;
+        }
+        
+        .btn-remove:hover {
+            background: #FAFAFA;
+            border-color: #D0D0D0;
+            color: #1A1A1A;
+        }
+        
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        
+        /* Modal için stil */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9998;
+            animation: fadeIn 0.2s;
+        }
+        
+        .modal-overlay.active {
+            display: block;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .modal.active {
+            display: block;
+        }
+        
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #E8E8E8;
+        }
+        
+        .modal-header h3 {
+            color: #00438C;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: #1A1A1A;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E8E8E8;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #007973;
+            box-shadow: 0 0 0 3px rgba(0, 121, 115, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #E8E8E8;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-modal {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #007973 0%, #1B9B97 100%);
+            color: white;
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 121, 115, 0.3);
+        }
+        
+        .btn-cancel {
+            background: #F5F5F5;
+            color: #666;
+        }
+        
+        .btn-cancel:hover {
+            background: #E8E8E8;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                transform: translate(-50%, -45%);
+                opacity: 0;
+            }
+            to { 
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+        
+        .leaflet-popup-content {
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .leaflet-popup-content h3 {
+            color: #00438C;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+        
+        .popup-custom-title {
+            color: #007973;
+            font-weight: 600;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .popup-custom-notes {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #E8E8E8;
+        }
+        
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        
+        .leaflet-bar {
+            border: 1px solid #E8E8E8;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .leaflet-bar a {
+            background-color: white;
+            color: #00438C;
+            border-bottom: 1px solid #E8E8E8;
+            transition: all 0.2s;
+        }
+        
+        .leaflet-bar a:hover {
+            background-color: #FAFAFA;
+        }
+        
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #D0D0D0;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 16px;
+            }
+            
+            .logo {
+                height: 36px;
+            }
+            
+            .header h1 {
+                font-size: 1.1em;
+            }
+            
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #E8E8E8;
+                padding: 16px 12px;
+            }
+            
+            .upload-area {
+                padding: 24px 12px;
+            }
+            
+            .upload-icon {
+                font-size: 28px;
+            }
+            
+            #map {
+                height: calc(100vh - 274px);
+            }
+            
+            .modal {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://imar.istanbul/logo_ibb.png" alt="İBB Logo" class="logo">
+        <div class="header-text">
+            <h1>İBB Parselleri Değerleme Çalışması</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <h2>Dosya Yönetimi</h2>
+            
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📂</div>
+                    <div class="upload-text">
+                        Dosya yükleyin
+                        <div class="upload-text-sub">KML veya KMZ</div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".kml,.kmz" multiple>
+                </div>
+            </div>
+            
+            <div class="file-list" id="fileList"></div>
+        </div>
+        
+        <div id="map"></div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal" id="editModal">
+        <div class="modal-header">
+            <h3>Dosya Bilgilerini Düzenle</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Dosya Adı</label>
+                <input type="text" id="editFileName" readonly style="background: #F5F5F5;">
+            </div>
+            <div class="form-group">
+                <label>Özel Başlık</label>
+                <input type="text" id="editTitle" placeholder="Başlık ekleyin...">
+            </div>
+            <div class="form-group">
+                <label>Notlar</label>
+                <textarea id="editNotes" placeholder="Notlarınızı buraya yazın..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-cancel" onclick="closeEditModal()">İptal</button>
+            <button class="btn-modal btn-save" onclick="saveEdit()">Kaydet</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        const map = L.map('map').setView([41.0082, 28.9784], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const loadedFiles = [];
+        let currentEditingIndex = -1;
+
+        loadDefaultKML();
+
+        function loadDefaultKML() {
+            fetch('data.kml')
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    return null;
+                })
+                .then(kmlText => {
+                    if (kmlText) {
+                        const blob = new Blob([kmlText], { type: 'application/vnd.google-earth.kml+xml' });
+                        const file = new File([blob], 'data.kml', { type: 'application/vnd.google-earth.kml+xml' });
+                        addFileToMap(file);
+                    }
+                })
+                .catch(err => console.log('Varsayılan KML yüklenemedi:', err));
+        }
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = Array.from(e.dataTransfer.files);
+            files.forEach(file => {
+                if (file.name.endsWith('.kml') || file.name.endsWith('.kmz')) {
+                    addFileToMap(file);
+                }
+            });
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => addFileToMap(file));
+            fileInput.value = '';
+        });
+
+        function addFileToMap(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const fileData = e.target.result;
+                
+                if (file.name.endsWith('.kmz')) {
+                    JSZip.loadAsync(fileData).then(zip => {
+                        zip.file("doc.kml").async("string").then(kmlText => {
+                            processKML(kmlText, file.name);
+                        });
+                    });
+                } else {
+                    processKML(fileData, file.name);
+                }
+            };
+            
+            if (file.name.endsWith('.kmz')) {
+                reader.readAsArrayBuffer(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        function processKML(kmlText, fileName) {
+            const kmlLayer = omnivore.kml.parse(kmlText);
+            
+            kmlLayer.addTo(map);
+            
+            if (kmlLayer.getBounds().isValid()) {
+                map.fitBounds(kmlLayer.getBounds());
+            }
+            
+            const fileObj = {
+                name: fileName,
+                layer: kmlLayer,
+                visible: true,
+                customTitle: '',
+                customNotes: ''
+            };
+            
+            loadedFiles.push(fileObj);
+            updatePopups(loadedFiles.length - 1);
+            updateFileList();
+        }
+
+        function updatePopups(fileIndex) {
+            const fileObj = loadedFiles[fileIndex];
+            
+            fileObj.layer.eachLayer(layer => {
+                if (layer.feature && layer.feature.properties) {
+                    const props = layer.feature.properties;
+                    let popupContent = '<div style="max-width: 300px;">';
+                    
+                    if (props.name) {
+                        popupContent += `<h3 style="margin-bottom: 10px; color: #00438C;">${props.name}</h3>`;
+                    }
+                    
+                    if (props.description) {
+                        popupContent += `<div>${props.description}</div>`;
+                    }
+                    
+                    if (fileObj.customTitle) {
+                        popupContent += `<div class="popup-custom-title">${fileObj.customTitle}</div>`;
+                    }
+                    
+                    if (fileObj.customNotes) {
+                        popupContent += `<div class="popup-custom-notes">${fileObj.customNotes}</div>`;
+                    }
+                    
+                    popupContent += '</div>';
+                    layer.bindPopup(popupContent);
+                }
+            });
+        }
+
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            
+            if (loadedFiles.length === 0) {
+                fileList.innerHTML = '';
+                return;
+            }
+            
+            let html = '<div class="file-list-header">Yüklü Dosyalar</div>';
+            
+            loadedFiles.forEach((fileObj, index) => {
+                html += `
+                    <div class="file-item">
+                        <div class="file-header">
+                            <div class="file-name">${fileObj.name}</div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-toggle ${fileObj.visible ? '' : 'hidden'}" onclick="toggleFileVisibility(${index})">
+                                ${fileObj.visible ? '👁️' : '👁️‍🗨️'}
+                            </button>
+                            <button class="btn btn-edit" onclick="openEditModal(${index})">
+                                ✏️
+                            </button>
+                            <button class="btn btn-remove" onclick="removeFile(${index})">
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            fileList.innerHTML = html;
+        }
+
+        function toggleFileVisibility(index) {
+            const fileObj = loadedFiles[index];
+            fileObj.visible = !fileObj.visible;
+            
+            if (fileObj.visible) {
+                map.addLayer(fileObj.layer);
+            } else {
+                map.removeLayer(fileObj.layer);
+            }
+            
+            updateFileList();
+        }
+
+        function removeFile(index) {
+            const fileObj = loadedFiles[index];
+            map.removeLayer(fileObj.layer);
+            loadedFiles.splice(index, 1);
+            updateFileList();
+        }
+
+        function openEditModal(index) {
+            currentEditingIndex = index;
+            const fileObj = loadedFiles[index];
+            
+            document.getElementById('editFileName').value = fileObj.name;
+            document.getElementById('editTitle').value = fileObj.customTitle || '';
+            document.getElementById('editNotes').value = fileObj.customNotes || '';
+            
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.getElementById('editModal').classList.remove('active');
+            currentEditingIndex = -1;
+        }
+
+        function saveEdit() {
+            if (currentEditingIndex === -1) return;
+            
+            const fileObj = loadedFiles[currentEditingIndex];
+            fileObj.customTitle = document.getElementById('editTitle').value;
+            fileObj.customNotes = document.getElementById('editNotes').value;
+            
+            updatePopups(currentEditingIndex);
+            closeEditModal();
+        }
+
+        // Modal overlay click to close
+        document.getElementById('modalOverlay').addEventListener('click', closeEditModal);
+
+        map.zoomControl.setPosition('topright');
+
+        L.control.scale({
+            imperial: false,
+            metric: true
+        }).addTo(map);
+    </script>
+</body>
+</html>
