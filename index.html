@@ -618,7 +618,6 @@
         <div id="map"></div>
     </div>
 
-    <!-- Name Modal -->
     <div class="modal-overlay" id="nameModalOverlay"></div>
     <div class="modal" id="nameModal">
         <div class="modal-header">
@@ -635,7 +634,6 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
     <div class="modal-overlay" id="editModalOverlay"></div>
     <div class="modal" id="editModal">
         <div class="modal-header">
@@ -661,7 +659,6 @@
         </div>
     </div>
 
-    <!-- Share Modal -->
     <div class="modal-overlay" id="shareModalOverlay"></div>
     <div class="modal" id="shareModal">
         <div class="modal-header">
@@ -697,37 +694,58 @@
         let currentUserName = localStorage.getItem('ibbUserName') || '';
         let pendingFiles = [];
 
-        // Load saved files from URL or localStorage
-        loadSharedFiles();
+        // --- BAŞLANGIÇ MANTIĞI GÜNCELLEMESİ ---
+        
+        // 1. URL'de paylaşılmış dosya var mı kontrol et
+        const urlParams = new URLSearchParams(window.location.search);
+        const filesParam = urlParams.get('files');
 
-        function loadSharedFiles() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const filesParam = urlParams.get('files');
-            
-            if (filesParam) {
-                try {
-                    const filesData = JSON.parse(decodeURIComponent(filesParam));
-                    loadedFiles = filesData;
-                    loadedFiles.forEach((fileObj, index) => {
-                        // Recreate layer from saved data would require the actual KML data
-                        // For now, we'll load from localStorage
-                    });
-                } catch (e) {
-                    console.error('Error loading shared files:', e);
+        if (filesParam) {
+            // DURUM A: Paylaşım Linki ile gelindi.
+            // LocalStorage'ı yoksay, varsayılan dosyayı yükleme.
+            try {
+                const filesData = JSON.parse(decodeURIComponent(filesParam));
+                
+                filesData.forEach(f => {
+                    if(f.name === 'data.kml') {
+                        // Sadece sistemde var olan ana dosyayı yükle
+                        addFileToMapByUrl('data.kml', f.uploader, f.customTitle, f.customNotes);
+                    } else {
+                        // GitHub Pages gibi statik yapılarda, kullanıcının kendi bilgisayarından yüklediği
+                        // özel KML dosyalarını URL üzerinden paylaşmak mümkün değildir (dosya sunucuda yok).
+                        console.log(f.name + " dosyası yerel bir dosya olduğu için paylaşılan görünümde açılamadı.");
+                    }
+                });
+                
+                if (filesData.length > 0) {
+                     // Kullanıcı bilgilendirmesi
+                     // alert("Paylaşılan görünüm yüklendi. Not: Sadece sistemdeki ana veriler görüntülenebilir, kişisel yüklemeler sunucuda barınmadığı için aktarılamaz.");
                 }
+
+            } catch (e) {
+                console.error('Paylaşılan dosyalar yüklenirken hata:', e);
             }
-            
-            // Try loading from localStorage as fallback
+        } else {
+            // DURUM B: Normal giriş yapıldı (Link yok)
             const savedFiles = localStorage.getItem('ibbLoadedFiles');
-            if (savedFiles && !filesParam) {
-                try {
-                    loadedFiles = JSON.parse(savedFiles);
-                } catch (e) {
-                    console.error('Error loading saved files:', e);
-                }
-            }
             
-            loadDefaultKML();
+            if (savedFiles) {
+                // Hafızada daha önce yapılmış işlemler var mı?
+                const parsedFiles = JSON.parse(savedFiles);
+                
+                // Eğer hafıza boş değilse dosyaları yükle
+                if (parsedFiles.length > 0) {
+                    parsedFiles.forEach(f => {
+                        if (f.name === 'data.kml') {
+                            addFileToMapByUrl('data.kml', f.uploader, f.customTitle, f.customNotes);
+                        }
+                    });
+                } 
+                // Eğer parsedFiles boşsa (kullanıcı her şeyi silmişse), hiçbir şey yapma.
+            } else {
+                // DURUM C: İlk defa giriliyor (Hafıza yok, Link yok)
+                addFileToMapByUrl('data.kml', 'Sistem');
+            }
         }
 
         function saveFilesToStorage() {
@@ -742,22 +760,49 @@
             localStorage.setItem('ibbLoadedFiles', JSON.stringify(fileMetadata));
         }
 
-        function loadDefaultKML() {
-            fetch('data.kml')
+        // URL'den dosya yükleme yardımcı fonksiyonu
+        function addFileToMapByUrl(url, uploader, title = '', notes = '') {
+            fetch(url)
                 .then(response => {
-                    if (response.ok) {
-                        return response.text();
-                    }
-                    return null;
+                    if (response.ok) return response.text();
+                    throw new Error('Dosya bulunamadı');
                 })
                 .then(kmlText => {
-                    if (kmlText) {
-                        const blob = new Blob([kmlText], { type: 'application/vnd.google-earth.kml+xml' });
-                        const file = new File([blob], 'data.kml', { type: 'application/vnd.google-earth.kml+xml' });
-                        addFileToMap(file, 'Sistem');
-                    }
+                    const blob = new Blob([kmlText], { type: 'application/vnd.google-earth.kml+xml' });
+                    const file = new File([blob], url, { type: 'application/vnd.google-earth.kml+xml' });
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // processKML fonksiyonunu biraz değiştirmeden burada manuel yapıyoruz
+                        // çünkü processKML otomatik kayıt yapıyor, biz kontrol etmek istiyoruz.
+                        const kmlLayer = omnivore.kml.parse(e.target.result);
+                        kmlLayer.addTo(map);
+                        
+                        if (kmlLayer.getBounds().isValid()) {
+                            map.fitBounds(kmlLayer.getBounds());
+                        }
+
+                        const fileObj = {
+                            name: url,
+                            layer: kmlLayer,
+                            visible: true,
+                            customTitle: title,
+                            customNotes: notes,
+                            uploader: uploader || 'Sistem'
+                        };
+                        
+                        loadedFiles.push(fileObj);
+                        updatePopups(loadedFiles.length - 1);
+                        updateFileList();
+                        
+                        // Sadece paylaşım linki DEĞİLSE kaydet
+                        if (!filesParam) {
+                            saveFilesToStorage();
+                        }
+                    };
+                    reader.readAsText(file);
                 })
-                .catch(err => console.log('Varsayılan KML yüklenemedi:', err));
+                .catch(err => console.log(url + ' yüklenemedi:', err));
         }
 
         const uploadArea = document.getElementById('uploadArea');
@@ -870,7 +915,11 @@
             loadedFiles.push(fileObj);
             updatePopups(loadedFiles.length - 1);
             updateFileList();
-            saveFilesToStorage();
+            
+            // Paylaşım modunda değilsek kaydet
+            if (!filesParam) {
+                saveFilesToStorage();
+            }
         }
 
         function updatePopups(fileIndex) {
@@ -951,15 +1000,27 @@
             }
             
             updateFileList();
-            saveFilesToStorage();
+            if (!filesParam) saveFilesToStorage();
         }
 
+        // --- SİLME FONKSİYONU GÜNCELLEMESİ ---
         function removeFile(index) {
             const fileObj = loadedFiles[index];
+            
+            // Haritadan kaldır
             map.removeLayer(fileObj.layer);
+            
+            // Diziden sil
             loadedFiles.splice(index, 1);
+            
+            // Listeyi güncelle
             updateFileList();
-            saveFilesToStorage();
+            
+            // Eğer paylaşım modunda DEĞİLSEK durumu hafızaya kaydet.
+            // Böylece F5 atınca silinen dosya geri gelmez.
+            if (!filesParam) {
+                saveFilesToStorage();
+            }
         }
 
         function openEditModal(index) {
@@ -989,7 +1050,7 @@
             
             updatePopups(currentEditingIndex);
             closeEditModal();
-            saveFilesToStorage();
+            if (!filesParam) saveFilesToStorage();
         }
 
         function shareFiles() {
@@ -1006,7 +1067,9 @@
             }));
             
             const encodedFiles = encodeURIComponent(JSON.stringify(fileMetadata));
-            const shareUrl = `${window.location.origin}${window.location.pathname}?files=${encodedFiles}`;
+            // Soru işaretini temizle ve yeni parametreleri ekle
+            const baseUrl = window.location.origin + window.location.pathname;
+            const shareUrl = `${baseUrl}?files=${encodedFiles}`;
             
             document.getElementById('shareLink').value = shareUrl;
             document.getElementById('shareModalOverlay').classList.add('active');
@@ -1031,7 +1094,6 @@
             }, 2000);
         }
 
-        // Modal overlays click to close
         document.getElementById('editModalOverlay').addEventListener('click', closeEditModal);
         document.getElementById('shareModalOverlay').addEventListener('click', closeShareModal);
 
