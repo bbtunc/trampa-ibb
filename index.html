@@ -36,7 +36,7 @@
 
         /* File List */
         .file-item { background: white; border: 1px solid #E8E8E8; border-radius: 6px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #ccc; }
-        .file-item.is-shared { border-left-color: #007973; background: #F8FDFF; } /* Paylaşılabilir olanlar yeşil */
+        .file-item.is-shared { border-left-color: #007973; background: #F8FDFF; }
         
         .file-name { font-weight: 600; font-size: 0.8em; margin-bottom: 4px; word-break: break-all; }
         .file-meta { font-size: 0.7em; color: #666; display: flex; justify-content: space-between; margin-bottom: 8px; }
@@ -52,7 +52,7 @@
         .share-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #007973 0%, #00438C 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .share-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
 
-        #map { flex: 1; height: 100%; }
+        #map { flex: 1; height: 100%; z-index: 1; }
 
         /* Modals */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; }
@@ -64,7 +64,7 @@
         .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
         
         .copy-box { display: flex; gap: 5px; background: #F5F5F5; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #ddd; }
-        .copy-box input { border: none; background: transparent; margin: 0; }
+        .copy-box input { border: none; background: transparent; margin: 0; width: 100%; }
 
         @media (max-width: 768px) { .container { flex-direction: column; } .sidebar { width: 100%; max-height: 40vh; } }
     </style>
@@ -134,50 +134,63 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
-        // --- MAP SETUP (GÜNCELLENMİŞ) ---
-    // 1. Katmanları tanımla
-    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19, attribution: '© OpenStreetMap'
-    });
+        // --- 10 FARKLI HARİTA GÖRÜNÜMÜ ---
+        
+        const mapLayers = {
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }),
+            uydu: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri' }),
+            sade: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '© CartoDB' }),
+            karanlik: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '© CartoDB' }),
+            sokak: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri' }),
+            topo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri' }),
+            arazi: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { attribution: '© OpenTopoMap' }),
+            gri: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', { attribution: '© Esri' }),
+            natgeo: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', { attribution: '© NatGeo' }),
+            humanitarian: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { attribution: '© OSM Hot' })
+        };
 
-    const uydu = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri'
-    });
+        const map = L.map('map', {
+            center: [41.0082, 28.9784],
+            zoom: 11,
+            layers: [mapLayers.osm] // Varsayılan açılış
+        });
 
-    // 2. Haritayı oluştur (Varsayılan olarak osm seçili)
-    const map = L.map('map', {
-        center: [41.0082, 28.9784],
-        zoom: 11,
-        layers: [osm] 
-    });
+        const baseMaps = {
+            "Standart (OSM)": mapLayers.osm,
+            "🛰️ Uydu Görüntüsü": mapLayers.uydu,
+            "✨ Sade/Açık (Analiz)": mapLayers.sade,
+            "🌑 Gece Modu": mapLayers.karanlik,
+            "🛣️ Detaylı Sokak": mapLayers.sokak,
+            "🏔️ Topografik": mapLayers.topo,
+            "🌲 Fiziki Arazi": mapLayers.arazi,
+            "⚪ Gri Tuval": mapLayers.gri,
+            "📖 NatGeo Dergi": mapLayers.natgeo,
+            "🚑 Humanitarian": mapLayers.humanitarian
+        };
 
-    // 3. Kontrol butonunu ekle
-    const baseMaps = {
-        "Sokak Haritası": osm,
-        "Uydu Görüntüsü": uydu
-    };
-    L.control.layers(baseMaps).addTo(map);
-    L.control.scale({imperial: false, metric: true}).addTo(map);
+        L.control.layers(baseMaps).addTo(map);
+        L.control.scale({imperial: false, metric: true}).addTo(map);
 
+
+        // --- STATE MANAGEMENT ---
         let loadedFiles = [];
         let currentUserName = localStorage.getItem('ibbUserName') || '';
         let pendingAction = null;
 
-        // --- BAŞLANGIÇ: LİNKTEKİ DOSYALARI YÜKLE ---
+        // --- LOAD INITIAL FILES ---
         window.addEventListener('load', () => {
             const params = new URLSearchParams(window.location.search);
-            const fileList = params.get('files'); // ?files=pendik.kml,kadikoy.kmz
+            const fileList = params.get('files');
 
             if (fileList) {
                 const names = fileList.split(',');
                 names.forEach(name => loadRemoteFile(name.trim(), 'Sistem'));
             } else {
-                // Varsayılan
                 loadRemoteFile('data.kml', 'Sistem');
             }
         });
 
-        // --- 1. İSİMLE EKLEME (PAYLAŞILABİLİR) ---
+        // --- REMOTE FILE (GITHUB) ---
         function addFileByName() {
             const input = document.getElementById('fileNameInput');
             const name = input.value.trim();
@@ -190,11 +203,8 @@
         }
 
         function loadRemoteFile(fileName, uploader) {
-            // Zaten yüklü mü?
             if (loadedFiles.some(f => f.source === fileName)) return;
 
-            // GitHub repo yapısında, dosyanın aynı klasörde olduğunu varsayıyoruz
-            // Dosya adını URL'e çeviriyoruz
             const url = fileName; 
 
             fetch(url)
@@ -212,7 +222,7 @@
                 });
         }
 
-        // --- 2. BİLGİSAYARDAN EKLEME (YEREL) ---
+        // --- LOCAL FILE (COMPUTER) ---
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
 
@@ -250,12 +260,11 @@
             });
         }
 
-        // --- ORTAK KATMAN EKLEME ---
+        // --- ADD LAYER COMMON ---
         function addLayerToMap(layer, name, type, source, uploader) {
             layer.addTo(map);
             if (layer.getBounds().isValid()) map.fitBounds(layer.getBounds());
 
-            // Popup ekle
             layer.eachLayer(l => {
                 if (l.feature?.properties) {
                     const p = l.feature.properties;
@@ -266,8 +275,8 @@
             loadedFiles.push({
                 id: Date.now() + Math.random(),
                 name: name,
-                type: type, // 'remote' (paylaşılabilir) veya 'local'
-                source: source, // dosya adı veya null
+                type: type, 
+                source: source,
                 layer: layer,
                 visible: true,
                 uploader: uploader
@@ -275,7 +284,7 @@
             renderList();
         }
 
-        // --- LİSTELEME VE SİLME ---
+        // --- UI FUNCTIONS ---
         function renderList() {
             const list = document.getElementById('fileList');
             list.innerHTML = '';
@@ -320,19 +329,16 @@
             }
         }
 
-        // --- PAYLAŞIM ---
         function shareFiles() {
-            // Sadece 'remote' (GitHub'da var olduğu varsayılan) dosyaları topla
             const shareableFiles = loadedFiles
                 .filter(f => f.type === 'remote')
-                .map(f => f.name); // Sadece dosya adlarını alıyoruz
+                .map(f => f.name);
 
             if (shareableFiles.length === 0) {
-                alert("Paylaşılacak 'GitHub kaynaklı' dosya yok.\n\nBilgisayardan sürükleyip bıraktığınız dosyalar sunucuda olmadığı için link oluşturulamaz.\n\nDosyayı paylaşmak için:\n1. GitHub'a yükleyin.\n2. Buraya dosya adını yazarak ekleyin.");
+                alert("Paylaşılacak 'GitHub kaynaklı' dosya yok.\n\nBilgisayardan sürüklediğiniz dosyalar paylaşılamaz.\n\nPaylaşmak için dosyayı reponuza yükleyin ve adını yazarak ekleyin.");
                 return;
             }
 
-            // Basit bir virgülle ayrılmış liste oluştur: ?files=pendik.kml,kadikoy.kml
             const param = encodeURIComponent(shareableFiles.join(','));
             const link = `${window.location.origin}${window.location.pathname}?files=${param}`;
             
@@ -341,7 +347,7 @@
             document.getElementById('shareModal').classList.add('active');
         }
 
-        // --- KULLANICI ADI YÖNETİMİ ---
+        // --- USER NAME LOGIC ---
         function checkNameAndRun(callback) {
             if (currentUserName) {
                 callback();
