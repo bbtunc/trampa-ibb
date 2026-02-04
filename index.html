@@ -19,68 +19,54 @@
         
         h2 { font-size: 0.9em; font-weight: 600; color: #1A1A1A; margin-bottom: 8px; }
         
-        /* Upload Area Styles */
-        .upload-area { border: 1.5px dashed #E8E8E8; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: #FAFAFA; }
+        /* Input Styles */
+        .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
+        .text-input { flex: 1; padding: 10px; border: 1px solid #E8E8E8; border-radius: 6px; font-size: 0.9em; }
+        .text-input:focus { outline: none; border-color: #007973; }
+        .btn-add { padding: 0 15px; background: #00438C; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-add:hover { background: #003366; }
+
+        /* Drag Drop Area */
+        .upload-area { border: 1.5px dashed #E8E8E8; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s; background: #FAFAFA; margin-bottom: 15px; }
         .upload-area:hover { border-color: #007973; background: #F0F9F9; }
-        .upload-icon { font-size: 24px; margin-bottom: 5px; }
-        .upload-text { font-size: 0.8em; color: #666; }
+        .upload-text { font-size: 0.8em; color: #666; margin-top: 5px; }
         #fileInput { display: none; }
 
-        /* URL Input Styles */
-        .url-input-group { display: flex; gap: 5px; margin-bottom: 15px; }
-        .url-input { flex: 1; padding: 8px; border: 1px solid #E8E8E8; border-radius: 6px; font-size: 0.85em; }
-        .btn-add-url { padding: 8px 12px; background: #00438C; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: 500; }
-        .btn-add-url:hover { background: #003366; }
-        
         .divider { height: 1px; background: #E8E8E8; margin: 5px 0; }
 
-        /* File List Styles */
-        .file-item { background: white; border: 1px solid #E8E8E8; border-radius: 6px; padding: 10px; margin-bottom: 8px; position: relative; }
-        .file-item.shared-source { border-left: 3px solid #00438C; }
-        .file-item.local-source { border-left: 3px solid #E8E8E8; }
+        /* File List */
+        .file-item { background: white; border: 1px solid #E8E8E8; border-radius: 6px; padding: 10px; margin-bottom: 8px; border-left: 3px solid #ccc; }
+        .file-item.is-shared { border-left-color: #007973; background: #F8FDFF; } /* Paylaşılabilir olanlar yeşil */
         
         .file-name { font-weight: 600; font-size: 0.8em; margin-bottom: 4px; word-break: break-all; }
-        .file-meta { font-size: 0.7em; color: #666; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
-        .badge-url { background: #E3F2FD; color: #00438C; }
-        .badge-local { background: #F5F5F5; color: #666; }
+        .file-meta { font-size: 0.7em; color: #666; display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .status-badge { font-size: 0.75em; padding: 2px 6px; border-radius: 4px; background: #eee; color: #666; }
+        .status-badge.shared { background: #E0F2F1; color: #00695C; }
 
         .file-actions { display: flex; gap: 4px; }
         .btn { padding: 5px 8px; border: 1px solid #E8E8E8; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75em; flex: 1; transition: all 0.2s; }
-        .btn:hover { background: #F5F5F5; transform: translateY(-1px); }
-        .btn-primary { background: #007973; color: white; border: none; }
-        .btn-primary:hover { background: #006863; }
+        .btn:hover { background: #F5F5F5; }
         .btn-danger { color: #D32F2F; border-color: #FFEBEE; }
         .btn-danger:hover { background: #FFEBEE; }
 
-        .share-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #007973 0%, #00438C 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: auto; }
-        .share-btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .share-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #007973 0%, #00438C 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .share-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
 
         #map { flex: 1; height: 100%; }
 
         /* Modals */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; animation: fadeIn 0.2s; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; }
         .modal-overlay.active { display: block; }
-        
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 400px; z-index: 2001; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 400px; z-index: 2001; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal.active { display: block; }
+        .modal h3 { color: #00438C; margin-bottom: 15px; }
+        .modal input, .modal textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
         
-        .modal h3 { margin-bottom: 15px; color: #00438C; font-size: 1.1em; }
-        .modal input, .modal textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.95em; }
-        .modal input:focus, .modal textarea:focus { outline: none; border-color: #007973; box-shadow: 0 0 0 3px rgba(0,121,115,0.1); }
-        
-        .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px; }
-        
-        .copy-box { display: flex; gap: 5px; background: #F5F5F5; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #E8E8E8; }
-        .copy-box input { margin: 0; border: none; background: transparent; padding: 5px; }
+        .copy-box { display: flex; gap: 5px; background: #F5F5F5; padding: 10px; border-radius: 6px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .copy-box input { border: none; background: transparent; margin: 0; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translate(-50%, -45%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
-
-        @media (max-width: 768px) {
-            .container { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; max-height: 40vh; }
-        }
+        @media (max-width: 768px) { .container { flex-direction: column; } .sidebar { width: 100%; max-height: 40vh; } }
     </style>
 </head>
 <body>
@@ -93,29 +79,27 @@
     
     <div class="container">
         <div class="sidebar">
-            <div style="background: #F8FDFF; padding: 10px; border-radius: 8px; border: 1px solid #E3F2FD;">
-                <h2 style="color: #00438C;">🌐 Paylaşılabilir Dosya Ekle</h2>
-                <p style="font-size: 0.75em; color: #666; margin-bottom: 8px;">GitHub linki veya dosya adı girin.</p>
-                <div class="url-input-group">
-                    <input type="text" id="kmlUrlInput" class="url-input" placeholder="örn: data.kml">
-                    <button class="btn-add-url" onclick="addFromUrlInput()">Ekle</button>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
             <div>
-                <h2>💻 Bilgisayardan Yükle</h2>
+                <h2>📁 Dosya Ekle</h2>
+                <p style="font-size: 0.75em; color: #666; margin-bottom: 8px;">
+                    Dosyayı GitHub reponuza yüklediyseniz adını yazın, link oluşturulabilir olsun. Bilgisayardan yüklerseniz link oluşturulamaz.
+                </p>
+                
+                <div class="input-group">
+                    <input type="text" id="fileNameInput" class="text-input" placeholder="Dosya adı (örn: pendik.kml)">
+                    <button class="btn-add" onclick="addFileByName()">Ekle</button>
+                </div>
+
                 <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📂</div>
-                    <div class="upload-text">Dosyaları sürükleyin veya tıklayın<br><span style="font-size: 0.8em; color: #999">(Sadece sizin tarayıcınızda görünür)</span></div>
+                    <div style="font-size: 20px;">📂</div>
+                    <div class="upload-text">veya bilgisayardan dosya seçin<br>(Sadece sizin ekranınızda görünür)</div>
                     <input type="file" id="fileInput" accept=".kml,.kmz" multiple>
                 </div>
             </div>
 
             <div class="file-list" id="fileList"></div>
             
-            <button class="share-btn" onclick="shareFiles()">🔗 Projeyi Paylaş</button>
+            <button class="share-btn" onclick="shareFiles()">🔗 Haritayı Paylaş</button>
         </div>
         
         <div id="map"></div>
@@ -123,40 +107,26 @@
 
     <div class="modal-overlay" id="nameModalOverlay"></div>
     <div class="modal" id="nameModal">
-        <h3>👤 Kimsiniz?</h3>
-        <p style="font-size: 0.85em; color: #666; margin-bottom: 12px;">Dosyaların kimin tarafından yüklendiğini göstermek için lütfen adınızı girin.</p>
+        <h3>👤 Kullanıcı Adı</h3>
+        <p style="font-size: 0.85em; color: #666; margin-bottom: 10px;">Dosyaları kimin yüklediği görünsün.</p>
         <input type="text" id="userNameInput" placeholder="Adınız Soyadınız">
         <div class="modal-footer">
-            <button class="btn btn-primary" onclick="saveUserName()" style="padding: 10px 20px;">Kaydet ve Devam Et</button>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="editModalOverlay"></div>
-    <div class="modal" id="editModal">
-        <h3>Düzenle</h3>
-        <label style="font-size: 0.8em; font-weight: 600;">Başlık</label>
-        <input type="text" id="editTitle" placeholder="Özel başlık...">
-        <label style="font-size: 0.8em; font-weight: 600;">Notlar</label>
-        <textarea id="editNotes" placeholder="Buraya notlarınızı ekleyebilirsiniz..."></textarea>
-        <div class="modal-footer">
-            <button class="btn" onclick="closeEditModal()">İptal</button>
-            <button class="btn btn-primary" onclick="saveEdit()">Kaydet</button>
+            <button class="btn btn-add" onclick="saveUserName()">Kaydet</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="shareModalOverlay"></div>
     <div class="modal" id="shareModal">
-        <h3>Bağlantı Hazır 🎉</h3>
+        <h3>🔗 Paylaşım Linki</h3>
         <p style="font-size: 0.85em; color: #666; margin-bottom: 10px;">
-            Aşağıdaki linki kopyalayıp paylaşabilirsiniz.
-            <br><span style="color: #D32F2F; font-size: 0.9em;">⚠️ Dikkat: Sadece "Linkten Ekle" kısmından eklenen dosyalar paylaşılır.</span>
+            Aşağıdaki link, <b>Repo'dan (isimle)</b> eklediğiniz dosyaları içerir.
         </p>
         <div class="copy-box">
             <input type="text" id="shareLink" readonly onclick="this.select()">
-            <button class="btn btn-primary" onclick="copyShareLink()">Kopyala</button>
+            <button class="btn btn-add" onclick="copyShareLink()">Kopyala</button>
         </div>
         <div class="modal-footer">
-            <button class="btn" onclick="closeShareModal()">Kapat</button>
+            <button class="btn" onclick="document.getElementById('shareModalOverlay').classList.remove('active')">Kapat</button>
         </div>
     </div>
 
@@ -164,212 +134,146 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
-        // --- MAP SETUP ---
         const map = L.map('map').setView([41.0082, 28.9784], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19, attribution: '© OpenStreetMap'
-        }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
         L.control.scale({imperial: false, metric: true}).addTo(map);
 
-        // --- STATE MANAGEMENT ---
         let loadedFiles = [];
         let currentUserName = localStorage.getItem('ibbUserName') || '';
-        let pendingFilesQueue = []; // İsim girilmesini bekleyen dosyalar
-        let editingId = null;
+        let pendingAction = null;
 
-        // --- INITIALIZATION ---
-        init();
+        // --- BAŞLANGIÇ: LİNKTEKİ DOSYALARI YÜKLE ---
+        window.addEventListener('load', () => {
+            const params = new URLSearchParams(window.location.search);
+            const fileList = params.get('files'); // ?files=pendik.kml,kadikoy.kmz
 
-        function init() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedData = urlParams.get('data');
-
-            if (sharedData) {
-                // Link ile gelindiyse
-                try {
-                    const files = JSON.parse(decodeURIComponent(sharedData));
-                    files.forEach(f => {
-                        addLayerFromUrl(f.url, f.uploader, f.title, f.notes);
-                    });
-                } catch (e) {
-                    console.error('Link hatası:', e);
-                }
+            if (fileList) {
+                const names = fileList.split(',');
+                names.forEach(name => loadRemoteFile(name.trim(), 'Sistem'));
             } else {
-                // Normal giriş - Hafızayı kontrol et
-                const saved = localStorage.getItem('ibbSavedState');
-                if (saved) {
-                    const files = JSON.parse(saved);
-                    if (files.length > 0) {
-                        files.forEach(f => {
-                            if (f.type === 'url') {
-                                addLayerFromUrl(f.source, f.uploader, f.title, f.notes);
-                            }
-                        });
-                    } else {
-                        // İlk açılış varsayılanı
-                        addLayerFromUrl('data.kml', 'Sistem');
-                    }
-                } else {
-                    addLayerFromUrl('data.kml', 'Sistem');
-                }
+                // Varsayılan
+                loadRemoteFile('data.kml', 'Sistem');
             }
-        }
+        });
 
-        // --- URL'DEN EKLEME (PAYLAŞILABİLİR) ---
-        function addFromUrlInput() {
-            const input = document.getElementById('kmlUrlInput');
-            const url = input.value.trim();
-            if (!url) return;
-
-            // Eğer isim yoksa burada da soralım
-            if (!currentUserName) {
-                // URL işlemini bekletmeye gerek yok, ismi sorup devam edelim veya varsayılan atayalım
-                // Ancak kullanıcı deneyimi için modal açmak en iyisi.
-                // Basitlik adına burada ziyaretçi atıyoruz veya modal açabiliriz.
-                // Local dosya mantığıyla tutarlı olması için modal açalım:
-                pendingFilesQueue.push({type: 'url', url: url});
-                showNameModal();
-                return;
-            }
+        // --- 1. İSİMLE EKLEME (PAYLAŞILABİLİR) ---
+        function addFileByName() {
+            const input = document.getElementById('fileNameInput');
+            const name = input.value.trim();
+            if (!name) return;
             
-            const uploader = currentUserName;
-            addLayerFromUrl(url, uploader);
-            input.value = '';
+            checkNameAndRun(() => {
+                loadRemoteFile(name, currentUserName);
+                input.value = '';
+            });
         }
 
-        function addLayerFromUrl(url, uploader, title = '', notes = '') {
-            if (loadedFiles.some(f => f.source === url)) return;
+        function loadRemoteFile(fileName, uploader) {
+            // Zaten yüklü mü?
+            if (loadedFiles.some(f => f.source === fileName)) return;
+
+            // GitHub repo yapısında, dosyanın aynı klasörde olduğunu varsayıyoruz
+            // Dosya adını URL'e çeviriyoruz
+            const url = fileName; 
 
             fetch(url)
                 .then(res => {
                     if (!res.ok) throw new Error('Dosya bulunamadı');
                     return res.text();
                 })
-                .then(kmlText => {
-                    const layer = omnivore.kml.parse(kmlText);
-                    finalizeLayer(layer, url, 'url', url, uploader, title, notes);
+                .then(text => {
+                    const layer = omnivore.kml.parse(text);
+                    addLayerToMap(layer, fileName, 'remote', fileName, uploader);
                 })
                 .catch(err => {
-                    alert(`Hata: ${url} yüklenemedi. Dosya adının doğruluğunu kontrol edin.`);
+                    console.error(err);
+                    alert(`"${fileName}" dosyası bulunamadı!\n\nEğer bu dosyayı paylaşmak istiyorsanız, GitHub reponuzda "index.html" dosyasının yanına yüklediğinizden emin olun.`);
                 });
         }
 
-        // --- BİLGİSAYARDAN EKLEME (YEREL) ---
+        // --- 2. BİLGİSAYARDAN EKLEME (YEREL) ---
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
 
         uploadArea.onclick = () => fileInput.click();
-        uploadArea.ondragover = (e) => { e.preventDefault(); uploadArea.style.borderColor = '#007973'; };
-        uploadArea.ondragleave = () => { uploadArea.style.borderColor = '#E8E8E8'; };
-        uploadArea.ondrop = (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#E8E8E8';
-            handleLocalFiles(e.dataTransfer.files);
-        };
-        fileInput.onchange = (e) => handleLocalFiles(e.target.files);
+        uploadArea.ondragover = e => { e.preventDefault(); uploadArea.style.borderColor = '#007973'; };
+        uploadArea.ondragleave = () => uploadArea.style.borderColor = '#E8E8E8';
+        uploadArea.ondrop = e => { e.preventDefault(); handleLocalFiles(e.dataTransfer.files); };
+        fileInput.onchange = e => handleLocalFiles(e.target.files);
 
         function handleLocalFiles(files) {
-            const fileArray = Array.from(files);
-            
-            // Eğer isim kayıtlı değilse işlemi durdur ve modal aç
-            if (!currentUserName) {
-                // Dosyaları kuyruğa at
-                fileArray.forEach(f => {
-                    if (f.name.endsWith('.kml') || f.name.endsWith('.kmz')) {
-                        pendingFilesQueue.push({type: 'file', file: f});
-                    }
+            checkNameAndRun(() => {
+                Array.from(files).forEach(file => {
+                    if (!file.name.match(/\.km(l|z)$/i)) return;
+                    
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const content = e.target.result;
+                        if (file.name.endsWith('.kmz')) {
+                            JSZip.loadAsync(content).then(zip => {
+                                zip.file("doc.kml").async("string").then(txt => {
+                                    const layer = omnivore.kml.parse(txt);
+                                    addLayerToMap(layer, file.name, 'local', null, currentUserName);
+                                });
+                            });
+                        } else {
+                            const layer = omnivore.kml.parse(content);
+                            addLayerToMap(layer, file.name, 'local', null, currentUserName);
+                        }
+                    };
+                    
+                    if (file.name.endsWith('.kmz')) reader.readAsArrayBuffer(file);
+                    else reader.readAsText(file);
                 });
-                
-                if (pendingFilesQueue.length > 0) {
-                    showNameModal();
-                }
-                return; // Fonksiyondan çık, modal cevabını bekle
-            }
-
-            // İsim varsa direkt işle
-            fileArray.forEach(file => {
-                if (file.name.endsWith('.kml') || file.name.endsWith('.kmz')) {
-                    processLocalFile(file);
-                }
+                fileInput.value = '';
             });
-            fileInput.value = '';
         }
 
-        function processLocalFile(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const content = e.target.result;
-                if (file.name.endsWith('.kmz')) {
-                    JSZip.loadAsync(content).then(zip => {
-                        zip.file("doc.kml").async("string").then(txt => {
-                            const layer = omnivore.kml.parse(txt);
-                            finalizeLayer(layer, file.name, 'local', null, currentUserName);
-                        });
-                    });
-                } else {
-                    const layer = omnivore.kml.parse(content);
-                    finalizeLayer(layer, file.name, 'local', null, currentUserName);
-                }
-            };
-            
-            if (file.name.endsWith('.kmz')) reader.readAsArrayBuffer(file);
-            else reader.readAsText(file);
-        }
-
-        // --- ORTAK KATMAN İŞLEME ---
-        function finalizeLayer(layer, name, type, sourceUrl, uploader, title='', notes='') {
+        // --- ORTAK KATMAN EKLEME ---
+        function addLayerToMap(layer, name, type, source, uploader) {
             layer.addTo(map);
             if (layer.getBounds().isValid()) map.fitBounds(layer.getBounds());
 
+            // Popup ekle
             layer.eachLayer(l => {
-                if (l.feature && l.feature.properties) {
+                if (l.feature?.properties) {
                     const p = l.feature.properties;
-                    let html = `<div style="font-size:13px"><b>${p.name || name}</b><br>${p.description || ''}`;
-                    if (title) html = `<div style="color:#007973;font-weight:bold;font-size:1.1em;margin-bottom:5px;">${title}</div>` + html;
-                    if (notes) html += `<div style="margin-top:8px;border-top:1px solid #eee;padding-top:5px;color:#555;background:#f9f9f9;padding:5px;border-radius:4px;"><i>📝 Not: ${notes}</i></div>`;
-                    html += `<div style="font-size:10px;color:#999;margin-top:5px;text-align:right;">Yükleyen: ${uploader}</div></div>`;
-                    l.bindPopup(html);
+                    l.bindPopup(`<b>${p.name || name}</b><br>${p.description || ''}<br><small>Yükleyen: ${uploader}</small>`);
                 }
             });
 
-            const fileObj = {
+            loadedFiles.push({
                 id: Date.now() + Math.random(),
                 name: name,
-                type: type,
-                source: sourceUrl,
+                type: type, // 'remote' (paylaşılabilir) veya 'local'
+                source: source, // dosya adı veya null
                 layer: layer,
                 visible: true,
-                title: title,
-                notes: notes,
                 uploader: uploader
-            };
-
-            loadedFiles.push(fileObj);
+            });
             renderList();
-            saveState();
         }
 
-        // --- ARAYÜZ LİSTELEME ---
+        // --- LİSTELEME VE SİLME ---
         function renderList() {
             const list = document.getElementById('fileList');
             list.innerHTML = '';
             
             loadedFiles.forEach(f => {
-                const badge = f.type === 'url' 
-                    ? `<span class="badge badge-url">🌐 Link</span>` 
-                    : `<span class="badge badge-local">💻 Yerel</span>`;
+                const isShared = f.type === 'remote';
+                const badgeText = isShared ? '🌐 Paylaşılabilir' : '💻 Sadece Sizde';
+                const badgeClass = isShared ? 'shared' : '';
                 
                 const div = document.createElement('div');
-                div.className = `file-item ${f.type === 'url' ? 'shared-source' : 'local-source'}`;
+                div.className = `file-item ${isShared ? 'is-shared' : ''}`;
                 div.innerHTML = `
-                    <div class="file-name">${f.title || f.name}</div>
+                    <div class="file-name">${f.name}</div>
                     <div class="file-meta">
                         <span>👤 ${f.uploader}</span>
-                        ${badge}
+                        <span class="status-badge ${badgeClass}">${badgeText}</span>
                     </div>
                     <div class="file-actions">
-                        <button class="btn btn-primary" onclick="toggleVis(${f.id})">${f.visible ? 'Gizle' : 'Göster'}</button>
-                        <button class="btn" onclick="editFile(${f.id})">Düzenle</button>
+                        <button class="btn" onclick="toggleVis(${f.id})">${f.visible ? 'Gizle' : 'Göster'}</button>
                         <button class="btn btn-danger" onclick="removeFile(${f.id})">Sil</button>
                     </div>
                 `;
@@ -377,54 +281,12 @@
             });
         }
 
-        // --- MODAL VE İSİM KAYDI ---
-        function showNameModal() {
-            document.getElementById('nameModalOverlay').classList.add('active');
-            document.getElementById('nameModal').classList.add('active');
-            document.getElementById('userNameInput').focus();
-        }
-
-        function saveUserName() {
-            const val = document.getElementById('userNameInput').value.trim();
-            if (val) {
-                currentUserName = val;
-                localStorage.setItem('ibbUserName', val);
-                
-                document.getElementById('nameModalOverlay').classList.remove('active');
-                document.getElementById('nameModal').classList.remove('active');
-                
-                // Bekleyen dosyaları işle
-                if (pendingFilesQueue.length > 0) {
-                    pendingFilesQueue.forEach(item => {
-                        if (item.type === 'file') {
-                            processLocalFile(item.file);
-                        } else if (item.type === 'url') {
-                            addLayerFromUrl(item.url, currentUserName);
-                            document.getElementById('kmlUrlInput').value = '';
-                        }
-                    });
-                    pendingFilesQueue = []; // Kuyruğu temizle
-                }
-            } else {
-                alert("Lütfen devam etmek için bir isim girin.");
-            }
-        }
-        
-        // Enter tuşu ile kaydetme
-        document.getElementById('userNameInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                saveUserName();
-            }
-        });
-
-        // --- DİĞER FONKSİYONLAR ---
         function toggleVis(id) {
             const f = loadedFiles.find(x => x.id === id);
             if (f) {
                 f.visible = !f.visible;
-                if (f.visible) map.addLayer(f.layer); else map.removeLayer(f.layer);
+                f.visible ? map.addLayer(f.layer) : map.removeLayer(f.layer);
                 renderList();
-                saveState();
             }
         }
 
@@ -434,88 +296,62 @@
                 map.removeLayer(loadedFiles[idx].layer);
                 loadedFiles.splice(idx, 1);
                 renderList();
-                saveState();
             }
         }
 
-        function saveState() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (!urlParams.has('data')) {
-                const toSave = loadedFiles
-                    .filter(f => f.type === 'url')
-                    .map(f => ({
-                        type: 'url',
-                        source: f.source,
-                        title: f.title,
-                        notes: f.notes,
-                        uploader: f.uploader
-                    }));
-                localStorage.setItem('ibbSavedState', JSON.stringify(toSave));
-            }
-        }
-
+        // --- PAYLAŞIM ---
         function shareFiles() {
-            const shareableData = loadedFiles
-                .filter(f => f.type === 'url')
-                .map(f => ({
-                    url: f.source,
-                    title: f.title,
-                    notes: f.notes,
-                    uploader: f.uploader
-                }));
+            // Sadece 'remote' (GitHub'da var olduğu varsayılan) dosyaları topla
+            const shareableFiles = loadedFiles
+                .filter(f => f.type === 'remote')
+                .map(f => f.name); // Sadece dosya adlarını alıyoruz
 
-            if (shareableData.length === 0) {
-                alert("Paylaşılacak 'Link kaynaklı' dosya yok. Lütfen dosyaları GitHub'a yükleyip 'Linkten Ekle' kısmını kullanın.");
+            if (shareableFiles.length === 0) {
+                alert("Paylaşılacak 'GitHub kaynaklı' dosya yok.\n\nBilgisayardan sürükleyip bıraktığınız dosyalar sunucuda olmadığı için link oluşturulamaz.\n\nDosyayı paylaşmak için:\n1. GitHub'a yükleyin.\n2. Buraya dosya adını yazarak ekleyin.");
                 return;
             }
 
-            const json = JSON.stringify(shareableData);
-            const encoded = encodeURIComponent(json);
-            const link = `${window.location.origin}${window.location.pathname}?data=${encoded}`;
+            // Basit bir virgülle ayrılmış liste oluştur: ?files=pendik.kml,kadikoy.kml
+            const param = encodeURIComponent(shareableFiles.join(','));
+            const link = `${window.location.origin}${window.location.pathname}?files=${param}`;
             
             document.getElementById('shareLink').value = link;
             document.getElementById('shareModalOverlay').classList.add('active');
             document.getElementById('shareModal').classList.add('active');
         }
 
-        function editFile(id) {
-            editingId = id;
-            const f = loadedFiles.find(x => x.id === id);
-            document.getElementById('editTitle').value = f.title;
-            document.getElementById('editNotes').value = f.notes;
-            document.getElementById('editModalOverlay').classList.add('active');
-            document.getElementById('editModal').classList.add('active');
-        }
-
-        function saveEdit() {
-            const f = loadedFiles.find(x => x.id === editingId);
-            if (f) {
-                f.title = document.getElementById('editTitle').value;
-                f.notes = document.getElementById('editNotes').value;
-                f.layer.eachLayer(l => {
-                    l.closePopup(); l.unbindPopup();
-                    finalizeLayer(f.layer, f.name, f.type, f.source, f.uploader, f.title, f.notes); 
-                });
+        // --- KULLANICI ADI YÖNETİMİ ---
+        function checkNameAndRun(callback) {
+            if (currentUserName) {
+                callback();
+            } else {
+                pendingAction = callback;
+                document.getElementById('nameModalOverlay').classList.add('active');
+                document.getElementById('nameModal').classList.add('active');
+                document.getElementById('userNameInput').focus();
             }
-            closeEditModal();
-            renderList();
-            saveState();
         }
 
-        function closeEditModal() {
-            document.getElementById('editModalOverlay').classList.remove('active');
-            document.getElementById('editModal').classList.remove('active');
+        function saveUserName() {
+            const val = document.getElementById('userNameInput').value.trim();
+            if (val) {
+                currentUserName = val;
+                localStorage.setItem('ibbUserName', val);
+                document.getElementById('nameModalOverlay').classList.remove('active');
+                document.getElementById('nameModal').classList.remove('active');
+                if (pendingAction) {
+                    pendingAction();
+                    pendingAction = null;
+                }
+            } else {
+                alert('Lütfen bir isim girin.');
+            }
         }
-        function closeShareModal() {
-            document.getElementById('shareModalOverlay').classList.remove('active');
-            document.getElementById('shareModal').classList.remove('active');
-        }
+
         function copyShareLink() {
             document.getElementById("shareLink").select();
             document.execCommand("copy");
         }
-        document.getElementById('editModalOverlay').onclick = closeEditModal;
-        document.getElementById('shareModalOverlay').onclick = closeShareModal;
     </script>
 </body>
 </html>
