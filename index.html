@@ -134,9 +134,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-omnivore/0.3.4/leaflet-omnivore.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
-        const map = L.map('map').setView([41.0082, 28.9784], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
-        L.control.scale({imperial: false, metric: true}).addTo(map);
+        // --- MAP SETUP (GÜNCELLENMİŞ) ---
+    // 1. Katmanları tanımla
+    const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19, attribution: '© OpenStreetMap'
+    });
+
+    const uydu = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri'
+    });
+
+    // 2. Haritayı oluştur (Varsayılan olarak osm seçili)
+    const map = L.map('map', {
+        center: [41.0082, 28.9784],
+        zoom: 11,
+        layers: [osm] 
+    });
+
+    // 3. Kontrol butonunu ekle
+    const baseMaps = {
+        "Sokak Haritası": osm,
+        "Uydu Görüntüsü": uydu
+    };
+    L.control.layers(baseMaps).addTo(map);
+    L.control.scale({imperial: false, metric: true}).addTo(map);
 
         let loadedFiles = [];
         let currentUserName = localStorage.getItem('ibbUserName') || '';
